@@ -106,19 +106,6 @@ class AdminController extends BaseController
         $old_picture = $user_info->picture;
         $new_filename = 'UIMG_'.$user_id.$file->getRandomName();
 
-        /* if( $file->move($path,$new_filename) ){
-           if( $old_picture != null && file_exists($path.$old_picture) ){
-                unlink($path.$old_picture);
-            } 
-            $user->where('id',$user_info->id)
-                 ->set(['picture'=>$new_filename])
-                 ->update();
-
-            echo json_encode(['status'=>1,'msg'=>'Done! Your profile picture has been successfully updated.']);
-        }else{
-            echo json_encode(['status'=>0,'msg'=>'Something went wrong']);
-        } */
-
         // Image manipulation
         $upload_image = \Config\Services::image()
                       ->withFile($file)
@@ -944,6 +931,12 @@ class AdminController extends BaseController
                     ->resize(450,300,true,'width')
                     ->save($path.'resized_'.$filename);
 
+                    // Create resized image
+                    \config\Services::image()
+                    ->withFile($path.$filename)
+                    ->resize(800,600,true,'width')
+                    ->save($path.'large_'.$filename);
+
                     // Save new post details
                     $post = new Post();
 
@@ -1152,6 +1145,12 @@ class AdminController extends BaseController
                     ->resize(450,300,true,'width')
                     ->save($path.'resized_'.$filename);
 
+                    // Create resized image
+                    \config\Services::image()
+                    ->withFile($path.$filename)
+                    ->resize(600,400,true,'width')
+                    ->save($path.'large_'.$filename);
+
                             //Delete old featured image
                             if( $old_post_featured_image != null && file_exists($path.$old_post_featured_image) ){
                                 unlink($path.$old_post_featured_image);
@@ -1163,6 +1162,10 @@ class AdminController extends BaseController
 
                             if( file_exists($path.'resized_'.$old_post_featured_image) ){
                                 unlink($path.'resized_'.$old_post_featured_image);
+                            }
+
+                            if( file_exists($path.'large_'.$old_post_featured_image) ){
+                                unlink($path.'large_'.$old_post_featured_image);
                             }
 
                             // Update post details in database
@@ -1239,6 +1242,9 @@ class AdminController extends BaseController
                 }
                 if( file_exists($path.'resized_'.$post_featured_image)){
                     unlink($path.'resized_'.$post_featured_image);
+                }
+                if( file_exists($path.'large_'.$post_featured_image)){
+                    unlink($path.'large_'.$post_featured_image);
                 }
                 //now delete post data from db
                 $delete = $post->delete($post_id);

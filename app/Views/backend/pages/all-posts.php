@@ -22,7 +22,7 @@
                 <a class="btn btn-primary" href="<?= route_to('new-post') ?>">
                     Add new post
                 </a>
-              
+
             </div>
         </div>
     </div>
@@ -38,7 +38,8 @@
                 </div>
             </div>
             <div class="card-body">
-                <table class="data-table table stripe hover nowrap dataTable no-footer dtr-inline collapsed" id="posts-table">
+                <table class="data-table table stripe hover nowrap dataTable no-footer dtr-inline collapsed"
+                    id="posts-table">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
@@ -47,10 +48,10 @@
                             <th scope="col">Category</th>
                             <th scope="col">Visibility</th>
                             <th scope="col">Action</th>
-                        </tr>                        
+                        </tr>
                     </thead>
                     <tbody></tbody>
-            </table>
+                </table>
             </div>
         </div>
     </div>
@@ -74,52 +75,58 @@
 <script src="/backend/src/plugins/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/backend/src/plugins/datatables/js/responsive.bootstrap4.min.js"></script>
 <script>
-    // Retrieve Posts
-    var posts_DT = $('table#posts-table').DataTable({
-        scrollCollapse:true,
-        responsive:true,
-        autoWidth:false,
-        processing:true,
-        serverSide:true,
-        ajax:"<?= route_to('get-posts') ?>",
-        "dom":"Brtip",
-        info:true,
-        fnCreatedRow:function(row,data,index)
-        {
-            $('td',row).eq(0).html(index+1);            
-        },
-        columnDefs: [{ orderable: false, targets: 5 }],
-        order: [[1, 'asc']]
-    });
+// Retrieve Posts
+var posts_DT = $('table#posts-table').DataTable({
+    scrollCollapse: true,
+    responsive: true,
+    autoWidth: false,
+    processing: true,
+    serverSide: true,
+    pageLength: 15,
+    ajax: "<?= route_to('get-posts') ?>",
+    "dom": "Brtip",
+    info: true,
+    fnCreatedRow: function(row, data, index) {
+        $('td', row).eq(0).html(index + 1);
+    },
+    columnDefs: [{
+        orderable: false,
+        targets: 5
+    }],
+    order: [
+        [1, 'asc']
+    ]
+});
 
-    $(document).on('click','.deletePostBtn', function(e){
-        e.preventDefault();
-        var post_id = $(this).data('id');
-        var url = "<?= route_to('delete-post') ?>";
-        Swal.fire({ // Swal must be a capitol / swal will throw a variable not found error
-            title:'Are you sure?',
-            html:'you want to delete this post',
-            showCloseButton:true,
-            showCancelButton:true,
-            cancelButtonText:'Cancel',
-            confirmButtonText:'Yes, Delete',
-            cancelButtonColor:'#d33',
-            confirmButtonColor:'#30853d',
-            width:400,
-            allowOutsideClick:false
-        }).then(function(result){
-            if( result.value ){
-                $.getJSON(url,{ post_id:post_id }, function(response){
-                    if( response.status == 1 ){
-                        posts_DT.ajax.reload(null,false);
-                        toastr.success(response.msg);
-                    }else{
-                        toastr.error(response.msg);
-                    }
-                });
-            }
-        });
+$(document).on('click', '.deletePostBtn', function(e) {
+    e.preventDefault();
+    var post_id = $(this).data('id');
+    var url = "<?= route_to('delete-post') ?>";
+    Swal.fire({ // Swal must be a capitol / swal will throw a variable not found error
+        title: 'Are you sure?',
+        html: 'you want to delete this post',
+        showCloseButton: true,
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonText: 'Yes, Delete',
+        cancelButtonColor: '#d33',
+        confirmButtonColor: '#30853d',
+        width: 400,
+        allowOutsideClick: false
+    }).then(function(result) {
+        if (result.value) {
+            $.getJSON(url, {
+                post_id: post_id
+            }, function(response) {
+                if (response.status == 1) {
+                    posts_DT.ajax.reload(null, false);
+                    toastr.success(response.msg);
+                } else {
+                    toastr.error(response.msg);
+                }
+            });
+        }
     });
-
+});
 </script>
 <?= $this->endSection() ?>
